@@ -28,7 +28,7 @@ touchscreen = st.selectbox('Touchscreen', ['No', 'Yes'])
 ips = st.selectbox('IPS', ['No', 'Yes'])
 
 # Screen Size
-screen_size = st.number_input('Screen Size (in inches)')
+screen_size = st.selectbox('Screen Size (in inches)', [13.3, 15.6, 15.4, 14.0, 12.0, 11.6, 17.3, 10.1, 13.5, 12.5, 13.0, 18.4, 13.9, 12.3, 17.0])
 
 # Resolution
 resolution = st.selectbox('Screen Resolution', [
@@ -51,30 +51,27 @@ gpu = st.selectbox('GPU Brand', df['Gpu brand'].unique())
 os = st.selectbox('OS', df['os'].unique())
 
 if st.button('Predict Price'):
-    if screen_size == 0.0:
-        st.error('Please enter a valid screen size.')
+    # Query point formatting
+    ppi = None
+    if touchscreen == 'Yes':
+        touchscreen = 1
     else:
-        # Query point formatting
-        ppi = None
-        if touchscreen == 'Yes':
-            touchscreen = 1
-        else:
-            touchscreen = 0
+        touchscreen = 0
 
-        if ips == 'Yes':
-            ips = 1
-        else:
-            ips = 0
+    if ips == 'Yes':
+        ips = 1
+    else:
+        ips = 0
 
-        X_res = int(resolution.split('x')[0])
-        Y_res = int(resolution.split('x')[1])
+    X_res = int(resolution.split('x')[0])
+    Y_res = int(resolution.split('x')[1])
 
-        ppi = ((X_res**2) + (Y_res**2))**0.5 / screen_size
+    ppi = ((X_res**2) + (Y_res**2))**0.5 / screen_size
 
-        query = pd.DataFrame(
-            [[company, type, ram, weight, touchscreen, ips, ppi, cpu, hdd, ssd, gpu, os]],
-            columns=['Company', 'TypeName', 'Ram', 'Weight', 'Touchscreen', 'Ips', 'ppi', 'Cpu brand', 'HDD', 'SSD', 'Gpu brand', 'os']
-        )
+    query = pd.DataFrame(
+        [[company, type, ram, weight, touchscreen, ips, ppi, cpu, hdd, ssd, gpu, os]],
+        columns=['Company', 'TypeName', 'Ram', 'Weight', 'Touchscreen', 'Ips', 'ppi', 'Cpu brand', 'HDD', 'SSD', 'Gpu brand', 'os']
+    )
 
-        prediction = pipe.predict(query)
-        st.title(f"The predicted price of this laptop is ₹{int(np.exp(prediction[0]))}")
+    prediction = pipe.predict(query)
+    st.title(f"The predicted price of this laptop is ₹{int(np.exp(prediction[0]))}")
