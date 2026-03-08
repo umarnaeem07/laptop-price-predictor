@@ -1,0 +1,5 @@
+laptop-price-predictor.ipynb
+out.log
+*.pyc
+__pycache__/
+*.pkl
